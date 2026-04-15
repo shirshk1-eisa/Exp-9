@@ -36,7 +36,7 @@ jobs:
 
       # ✅ Debug: verify build output exists
       - name: Check build output
-        run: ls -la frontend/build
+        run: ls -la frontend/dist
 
       # ✅ Build Docker Image
       - name: Build Docker Image
