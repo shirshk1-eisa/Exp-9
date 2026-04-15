@@ -41,7 +41,11 @@ jobs:
       # ✅ Build Docker Image
       - name: Build Docker Image
         run: docker build -f docker/Dockerfile -t $IMAGE_NAME .
-
+         
+        DEBUG STEP (ADD THIS HERE)
+      - name: Debug Docker Username
+        run: echo "USERNAME=${{ secrets.DOCKER_NAME }}"
+        
       # ✅ Login to Docker Hub (FIXED)
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
