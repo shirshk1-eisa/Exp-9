@@ -16,7 +16,6 @@ A modern dashboard to monitor GitHub Actions workflows and Docker Hub deployment
    For GitHub Actions, add repo secrets:
    - `DOCKER_NAME` = your Docker Hub username
    - `DOCKER_TOKEN` = your Docker Hub access token
-   (The workflow also supports `DOCKER_USERNAME` / `DOCKER_PASSWORD` for compatibility.)
 
    Test with: `octocat/Hello-World` & `library/hello-world`
 
