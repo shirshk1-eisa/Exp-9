@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
   build:
@@ -10,42 +10,50 @@ jobs:
 
     env:
       IMAGE_NAME: devdeploy-dashboard
-      DOCKER_LOGIN_USERNAME: ${{ secrets.DOCKER_NAME }}
-      DOCKER_LOGIN_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
     steps:
+      # ✅ Checkout repo
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # ✅ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
+          cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
+      # ✅ Install dependencies
       - name: Install Dependencies
-        run: |
-          cd frontend
-          npm ci
+        working-directory: ./frontend
+        run: npm install
 
+      # ✅ Build React App
       - name: Build React App
-        run: |
-          cd frontend
-          npm run build
+        working-directory: ./frontend
+        run: npm run build
 
+      # ✅ Debug: verify build output exists
+      - name: Check build output
+        run: ls -la frontend/build
+
+      # ✅ Build Docker Image
       - name: Build Docker Image
         run: docker build -f docker/Dockerfile -t $IMAGE_NAME .
 
-      # 🔥 Always try login (no if condition)
+      # ✅ Login to Docker Hub (FIXED)
       - name: Login to Docker Hub
-        run: echo "$DOCKER_LOGIN_PASSWORD" | docker login -u "$DOCKER_LOGIN_USERNAME" --password-stdin
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
 
+      # ✅ Tag Image
       - name: Tag Image
-        run: docker tag $IMAGE_NAME $DOCKER_LOGIN_USERNAME/$IMAGE_NAME:latest
+        run: docker tag $IMAGE_NAME ${{ secrets.DOCKER_NAME }}/$IMAGE_NAME:latest
 
+      # ✅ Push Image
       - name: Push Image
-        run: docker push $DOCKER_LOGIN_USERNAME/$IMAGE_NAME:latest
+        run: docker push ${{ secrets.DOCKER_NAME }}/$IMAGE_NAME:latest
 
+      # ✅ Done
       - name: Done
-        run: echo "Deployment Complete 🚀"
+        run: echo "CI/CD completed successfully 🚀"
