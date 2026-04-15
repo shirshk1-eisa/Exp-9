@@ -12,52 +12,40 @@ jobs:
       IMAGE_NAME: devdeploy-dashboard
 
     steps:
-      # ✅ Checkout repo
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ✅ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
-      # ✅ Install dependencies
       - name: Install Dependencies
         working-directory: ./frontend
         run: npm install
 
-      # ✅ Build React App
       - name: Build React App
         working-directory: ./frontend
         run: npm run build
 
-      # ✅ Debug: verify build output exists
       - name: Check build output
         run: ls -la frontend/dist
 
-      # ✅ Build Docker Image
       - name: Build Docker Image
         run: docker build -f docker/Dockerfile -t $IMAGE_NAME .
-         
-        DEBUG STEP (ADD THIS HERE)
+
+      # 🔍 DEBUG (correct syntax)
       - name: Debug Docker Username
         run: echo "USERNAME=${{ secrets.DOCKER_NAME }}"
-        
-      # ✅ Login to Docker Hub (FIXED)
+
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
 
-      # ✅ Tag Image
       - name: Tag Image
         run: docker tag $IMAGE_NAME ${{ secrets.DOCKER_NAME }}/$IMAGE_NAME:latest
 
-      # ✅ Push Image
       - name: Push Image
         run: docker push ${{ secrets.DOCKER_NAME }}/$IMAGE_NAME:latest
 
-      # ✅ Done
       - name: Done
         run: echo "CI/CD completed successfully 🚀"
