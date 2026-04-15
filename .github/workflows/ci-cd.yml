@@ -10,6 +10,8 @@ jobs:
 
     env:
       IMAGE_NAME: devdeploy-dashboard
+      DOCKER_LOGIN_USERNAME: ${{ secrets.DOCKER_NAME || secrets.DOCKER_USERNAME }}
+      DOCKER_LOGIN_PASSWORD: ${{ secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
 
     steps:
       - name: Checkout Code
@@ -37,13 +39,13 @@ jobs:
 
       # 🔥 Always try login (no if condition)
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "$DOCKER_LOGIN_PASSWORD" | docker login -u "$DOCKER_LOGIN_USERNAME" --password-stdin
 
       - name: Tag Image
-        run: docker tag $IMAGE_NAME ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
+        run: docker tag $IMAGE_NAME $DOCKER_LOGIN_USERNAME/$IMAGE_NAME:latest
 
       - name: Push Image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
+        run: docker push $DOCKER_LOGIN_USERNAME/$IMAGE_NAME:latest
 
       - name: Done
         run: echo "Deployment Complete 🚀"
